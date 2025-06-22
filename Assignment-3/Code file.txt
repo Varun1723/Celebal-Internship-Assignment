@@ -1,0 +1,46 @@
+Problem-1: SELECT ALL
+SELECT *
+FROM CITY;
+---------------------------------
+Problem-2: SELECT by ID
+SELECT *
+FROM CITY
+WHERE ID = 1661;
+---------------------------------
+Problem-3: Employee Names
+SELECT name
+FROM Employee
+ORDER BY name
+---------------------------------
+Problem-4: Japanese Cities' Attributes
+SELECT *
+FROM CITY
+WHERE COUNTRYCODE = 'JPN';
+---------------------------------
+Problem-5,6,7,8: Weather Observation Station 1,Weather Observation Station 3,Weather Observation Station 4,Weather Observation Station 5
+-> SELECT CITY, STATE
+FROM STATION;
+-> SELECT DISTINCT CITY
+FROM STATION
+WHERE (ID%2)=0;
+-> SELECT (count(CITY) - count(distinct CITY)) 
+FROM STATION;
+-> (SELECT CITY, LENGTH(CITY) AS name_length
+ FROM STATION
+ ORDER BY LENGTH(CITY) ASC, CITY ASC
+ LIMIT 1)
+UNION
+(SELECT CITY, LENGTH(CITY) AS name_length
+ FROM STATION
+ ORDER BY LENGTH(CITY) DESC, CITY ASC
+ LIMIT 1);
+---------------------------------
+ Problem-9,10 : Average Population ,Average Population of Each Continent
+-> SELECT ROUND(AVG(Population))
+FROM CITY
+-> SELECT cn.continent, FLOOR(AVG(c.population))
+FROM country as cn
+INNER JOIN city as c
+ON c.countrycode = cn.code
+GROUP BY cn.continent
+---------------------------------
