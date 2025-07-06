@@ -1,0 +1,14 @@
+[
+  {
+    "table": "Customers",
+    "cols": "CustomerID,CompanyName,ContactName"
+  },
+  {
+    "table": "Orders",
+    "cols": "OrderID,CustomerID,OrderDate"
+  },
+  {
+    "table": "Employees",
+    "cols": "EmployeeID,FirstName,LastName"
+  }
+]
