@@ -1,0 +1,35 @@
+{
+  "name": "FTP_Extract_Pipeline",
+  "properties": {
+    "activities": [
+      {
+        "name": "CopyFromFTP",
+        "type": "Copy",
+        "policy": {
+          "retry": 3,
+          "timeout": "00:05:00"
+        },
+        "typeProperties": {
+          "source": {
+            "type": "FtpServerSource"
+          },
+          "sink": {
+            "type": "AzureBlobSink"
+          }
+        },
+        "inputs": [
+          {
+            "referenceName": "FTP_LinkedService",
+            "type": "LinkedServiceReference"
+          }
+        ],
+        "outputs": [
+          {
+            "referenceName": "LandingBlobDataset",
+            "type": "DatasetReference"
+          }
+        ]
+      }
+    ]
+  }
+}

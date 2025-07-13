@@ -1,0 +1,42 @@
+{
+  "name": "Incremental_Load_Pipeline",
+  "properties": {
+    "parameters": {
+      "LastWatermark": {
+        "type": "String",
+        "defaultValue": "1900-01-01T00:00:00Z"
+      }
+    },
+    "activities": [
+      {
+        "name": "LookupWatermark",
+        "type": "Lookup",
+        "typeProperties": {
+          "source": {
+            "type": "AzureSqlSource",
+            "sqlReaderQuery": "SELECT MAX(ModifiedDate) AS Watermark FROM dbo.MyTable"
+          }
+        }
+      },
+      {
+        "name": "CopyIncremental",
+        "type": "Copy",
+        "dependsOn": [
+          {
+            "activity": "LookupWatermark",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "source": {
+            "type": "SqlSource",
+            "sqlReaderQuery": "SELECT * FROM dbo.MyTable WHERE ModifiedDate > '@{activity('LookupWatermark').output.firstRow.Watermark}'"
+          },
+          "sink": {
+            "type": "AzureSqlSink"
+          }
+        }
+      }
+    ]
+  }
+}

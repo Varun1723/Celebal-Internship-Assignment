@@ -1,0 +1,27 @@
+{
+  "name": "LastSaturdayTrigger",
+  "properties": {
+    "type": "ScheduleTrigger",
+    "typeProperties": {
+      "recurrence": {
+        "frequency": "Month",
+        "interval": 1,
+        "schedule": {
+          "hours": [2],
+          "timeZone": "UTC",
+          "weekDays": ["Saturday"],
+          "weekNumbers": [-1]
+        }
+      }
+    },
+    "pipelines": [
+      {
+        "pipelineReference": {
+          "referenceName": "YourPipelineName",
+          "type": "PipelineReference"
+        },
+        "parameters": {}
+      }
+    ]
+  }
+}
