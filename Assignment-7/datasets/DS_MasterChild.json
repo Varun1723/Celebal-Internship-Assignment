@@ -1,0 +1,17 @@
+{
+  "name": "DS_MasterChild",
+  "properties": {
+    "linkedServiceName": { "referenceName": "LS_BlobStorage" },
+    "parameters": { "FileName": { "type": "String" } },
+    "type": "DelimitedText",
+    "typeProperties": {
+      "location": {
+        "type": "AzureBlobStorageLocation",
+        "container": "datalake",
+        "blobPath": "@concat('master_child_export/', dataset().FileName)"
+      },
+      "columnDelimiter": ",",
+      "firstRowAsHeader": true
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "DS_CustMstr",
+  "properties": {
+    "linkedServiceName": { "referenceName": "LS_BlobStorage" },
+    "parameters": { "FileName": { "type": "String" } },
+    "type": "DelimitedText",
+    "typeProperties": {
+      "location": {
+        "type": "AzureBlobStorageLocation",
+        "container": "datalake",
+        "blobPath": "@concat('CUST_MSTR/', dataset().FileName)"
+      },
+      "columnDelimiter": ",",
+      "firstRowAsHeader": true
+    }
+  }
+}

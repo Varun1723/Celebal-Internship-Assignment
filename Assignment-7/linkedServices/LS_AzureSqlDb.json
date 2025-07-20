@@ -1,0 +1,9 @@
+{
+  "name": "LS_AzureSqlDb",
+  "properties": {
+    "type": "AzureSqlDatabase",
+    "typeProperties": {
+      "connectionString": "@pipeline().parameters.sqlConn"
+    }
+  }
+}

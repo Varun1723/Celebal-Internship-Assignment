@@ -1,0 +1,9 @@
+{
+  "name": "LS_BlobStorage",
+  "properties": {
+    "type": "AzureBlobStorage",
+    "typeProperties": {
+      "connectionString": "@pipeline().parameters.blobConn"
+    }
+  }
+}

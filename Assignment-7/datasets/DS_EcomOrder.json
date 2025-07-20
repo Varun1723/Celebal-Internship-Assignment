@@ -1,0 +1,16 @@
+{
+  "name": "DS_EcomOrder",
+  "properties": {
+    "linkedServiceName": { "referenceName": "LS_BlobStorage" },
+    "type": "DelimitedText",
+    "typeProperties": {
+      "location": {
+        "type": "AzureBlobStorageLocation",
+        "container": "datalake",
+        "folderPath": "H_ECOM_ORDER"
+      },
+      "columnDelimiter": ",",
+      "firstRowAsHeader": true
+    }
+  }
+}

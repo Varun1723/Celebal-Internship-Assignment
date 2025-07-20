@@ -1,0 +1,144 @@
+{
+  "name": "PL_LoadAll",
+  "properties": {
+    "parameters": {
+      "blobConn": { "type": "String" },
+      "sqlConn":  { "type": "String" }
+    },
+    "activities": [
+      {
+        "name": "TruncateTables",
+        "type": "SqlServerStoredProcedure",
+        "linkedServiceName": { "referenceName": "LS_AzureSqlDb" },
+        "typeProperties": {
+          "storedProcedureName": "sp_TruncateAll"   /* create this in your DB */
+        }
+      },
+      {
+        "name": "GetFileList",
+        "type": "GetMetadata",
+        "dependsOn": [{ "activity": "TruncateTables", "dependencyConditions": ["Succeeded"] }],
+        "typeProperties": {
+          "dataset": {
+            "referenceName": "DS_EcomOrder",
+            "type": "DatasetReference"
+          },
+          "fieldList": ["childItems"]
+        }
+      },
+      {
+        "name": "ForEachFile",
+        "type": "ForEach",
+        "dependsOn": [{ "activity": "GetFileList", "dependencyConditions": ["Succeeded"] }],
+        "typeProperties": {
+          "items": "@activity('GetFileList').output.childItems",
+          "activities": [
+            {
+              "name": "BranchOnType",
+              "type": "IfCondition",
+              "typeProperties": {
+                "expression": {
+                  "value": "@startswith(item().name, 'CUST_MSTR_')",
+                  "type": "Expression"
+                },
+                "ifTrueActivities": [
+                  {
+                    "name": "Copy_CUST_MSTR",
+                    "type": "Copy",
+                    "typeProperties": {
+                      "source": {
+                        "type": "DelimitedTextSource"
+                      },
+                      "sink": {
+                        "type": "SqlSink",
+                        "preCopyScript": "",
+                        "enableIdentityInsert": false
+                      },
+                      "enableStaging": false,
+                      "translator": { "type": "TabularTranslator" },
+                      "additionalColumns": {
+                        "date": {
+                          "value": "@toDate(substring(item().name,12,8),'yyyyMMdd')",
+                          "type": "Expression"
+                        }
+                      }
+                    },
+                    "inputs": [
+                      {
+                        "referenceName": "DS_CustMstr",
+                        "parameters": { "FileName": "@item().name" },
+                        "type": "DatasetReference"
+                      }
+                    ],
+                    "outputs": [
+                      { "referenceName": "CUST_MSTR", "type": "DatasetReference" }
+                    ]
+                  }
+                ],
+                "ifFalseActivities": [
+                  {
+                    "name": "BranchOnMasterChild",
+                    "type": "IfCondition",
+                    "typeProperties": {
+                      "expression": {
+                        "value": "@startswith(item().name, 'master_child_export-')",
+                        "type": "Expression"
+                      },
+                      "ifTrueActivities": [
+                        {
+                          "name": "Copy_MasterChild",
+                          "type": "Copy",
+                          "typeProperties": {
+                            "source": { "type": "DelimitedTextSource" },
+                            "sink": { "type": "SqlSink" },
+                            "translator": { "type": "TabularTranslator" },
+                            "additionalColumns": {
+                              "date": {
+                                "value": "@toDate(substring(item().name,20,8),'yyyyMMdd')",
+                                "type": "Expression"
+                              },
+                              "datekey": {
+                                "value": "@toInteger(substring(item().name,20,8))",
+                                "type": "Expression"
+                              }
+                            }
+                          },
+                          "inputs": [
+                            {
+                              "referenceName": "DS_MasterChild",
+                              "parameters": { "FileName": "@item().name" },
+                              "type": "DatasetReference"
+                            }
+                          ],
+                          "outputs": [
+                            { "referenceName": "master_child", "type": "DatasetReference" }
+                          ]
+                        }
+                      ],
+                      "ifFalseActivities": [
+                        {
+                          "name": "Copy_EcomOrder",
+                          "type": "Copy",
+                          "typeProperties": {
+                            "source": { "type": "DelimitedTextSource" },
+                            "sink": { "type": "SqlSink" }
+                          },
+                          "inputs": [
+                            { "referenceName": "DS_EcomOrder", "type": "DatasetReference" }
+                          ],
+                          "outputs": [
+                            { "referenceName": "H_ECOM_Orders", "type": "DatasetReference" }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
