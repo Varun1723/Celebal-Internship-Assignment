@@ -1,0 +1,44 @@
+name: Scheduled Country‑Data Fetch
+on:
+  schedule:
+    # 30 minutes after 18:00 UTC → 00:00 IST
+    - cron:  "30 18 * * *"
+    # 30 minutes after 06:00 UTC → 12:00 IST
+    - cron:  "30 6 * * *"
+
+jobs:
+  fetch-and-commit:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Check out the repo
+      - uses: actions/checkout@v4
+        with:
+          # Allow the workflow to push commits:
+          persist-credentials: true
+
+      # 2. Set up Python
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      # 3. Install dependencies
+      - name: Install requests
+        run: pip install requests
+
+      # 4. Run your fetch_data.py
+      - name: Fetch country JSONs
+        run: python fetch_data.py
+
+      # 5. Commit & push any changes
+      - name: Commit fetched JSONs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add rest_data/*.json
+          # Only commit if there are changes
+          if ! git diff --cached --quiet; then
+            git commit -m "📥 Scheduled update of country data"
+            git push
+          else
+            echo "No changes to commit"
+          fi
